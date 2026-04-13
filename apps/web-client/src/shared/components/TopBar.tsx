@@ -108,11 +108,20 @@ export const TopBar = () => {
           <li>
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="topbar-item"
-              aria-label="Search"
-              title="Search"
+              className="topbar-item DocSearch-Button"
+              aria-label="Search (Ctrl+K)"
+              title="Search (Ctrl+K)"
             >
-              <i className="pi pi-search"></i>
+              <span className="DocSearch-Button-Container">
+                <i className="pi pi-search docsearch-search-icon"></i>
+                <span className="DocSearch-Button-Placeholder">Search</span>
+              </span>
+              <span className="DocSearch-Button-Keys">
+                <kbd className="DocSearch-Button-Key">
+                  <i className="pi pi-command" style={{ fontSize: '0.75rem' }}></i>
+                </kbd>
+                <kbd className="DocSearch-Button-Key">K</kbd>
+              </span>
             </button>
           </li>
 
