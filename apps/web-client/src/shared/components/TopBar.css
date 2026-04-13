@@ -78,30 +78,42 @@
 }
 
 .layout-topbar-inner .topbar-items li {
+    position: relative;
     display: flex;
     align-items: center;
 }
 
-.layout-topbar-inner .topbar-items a {
+.layout-topbar-inner .topbar-items .topbar-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color, #e2e8f0);
+    width: 2rem;
+    height: 2rem;
+    transition: outline-color 0.2s, border-color 0.2s;
+    border-radius: 6px;
+    margin: 0;
+    padding: 0;
+    outline-color: transparent;
+    background-color: var(--surface, #ffffff);
+    cursor: pointer;
     text-decoration: none;
-    color: var(--topbar-text-color, #4b5563);
+    color: var(--text-primary, #4b5563);
+    font-size: 1.2rem;
 }
 
-.layout-topbar.dark .layout-topbar-inner .topbar-items a {
-    color: var(--topbar-text-color-dark, #9ca3af);
+.layout-topbar.dark .layout-topbar-inner .topbar-items .topbar-item {
+    border-color: var(--border-color-dark, #1f2937);
+    background-color: var(--surface-strong, #1e293b);
+    color: var(--text-primary, #f1f5f9);
 }
 
-.layout-topbar-inner .topbar-items a:hover {
+.layout-topbar-inner .topbar-items .topbar-item:hover {
     background-color: var(--topbar-item-hover-bg, #f3f4f6);
 }
 
-.layout-topbar.dark .layout-topbar-inner .topbar-items a:hover {
+.layout-topbar.dark .layout-topbar-inner .topbar-items .topbar-item:hover {
     background-color: var(--topbar-item-hover-bg-dark, #1f2937);
 }
 
