@@ -182,7 +182,6 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
         <div className={styles.shell}>
           <section className={styles.hero}>
             <div className={styles.heroCopy}>
-              <p className={styles.kicker}>{copy.hero.kicker}</p>
               <h1 className={styles.title}>{copy.hero.title}</h1>
               <p className={styles.subtitle}>{copy.hero.subtitle}</p>
             </div>
@@ -199,7 +198,6 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
       <div className={styles.shell}>
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <p className={styles.kicker}>{copy.hero.kicker}</p>
             <h1 className={styles.title}>{copy.hero.title}</h1>
             <p className={styles.subtitle}>{copy.hero.subtitle}</p>
 
