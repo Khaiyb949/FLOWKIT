@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { PRIMARY_COLORS, BRAND, SOCIAL_LINKS, TOPBAR_CSS_VARIABLES } from '../constants/theme';
 // @ts-ignore - CSS module import
@@ -9,11 +9,39 @@ import './TopBar.css';
 export const TopBar = () => {
   const [isDark, setIsDark] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showVersionMenu, setShowVersionMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<typeof PRIMARY_COLORS[number]>(PRIMARY_COLORS[0]);
+  const [currentLanguage, setCurrentLanguage] = useState({ code: 'en', name: 'English', flag: '🇺🇸' });
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  ];
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Refs for click outside
+  const colorPickerRef = useRef<HTMLLIElement>(null);
+  const languageMenuRef = useRef<HTMLLIElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
+        setShowColorPicker(false);
+      }
+      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target as Node)) {
+        setShowLanguageMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Apply theme to document and set CSS variables
   useEffect(() => {
@@ -166,7 +194,7 @@ export const TopBar = () => {
           </li>
 
           {/* Theme customizer */}
-          <li className="relative">
+          <li className="relative" ref={colorPickerRef}>
             <button
               onClick={() => setShowColorPicker(!showColorPicker)}
               className="topbar-item"
@@ -208,28 +236,39 @@ export const TopBar = () => {
             </button>
           </li>
 
-          {/* Version selector */}
-          <li className="relative">
+          {/* Language selector */}
+          <li className="relative" ref={languageMenuRef}>
             <button
-              onClick={() => setShowVersionMenu(!showVersionMenu)}
-              className="topbar-item version-item !w-auto !px-2 flex items-center gap-1"
+              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+              className="topbar-item version-item !w-auto !px-2 flex items-center gap-2"
+              title="Change language"
             >
-              <span className="text-xs font-medium">{BRAND.version}</span>
+              <span className="text-sm">{currentLanguage.flag}</span>
+              <span className="text-xs font-medium uppercase">{currentLanguage.code}</span>
               <i className="pi pi-angle-down" style={{ fontSize: '0.8rem' }}></i>
             </button>
 
-            {/* Versions dropdown */}
-            {showVersionMenu && (
-              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg p-2 border border-slate-200 dark:border-slate-700 z-50">
-                <a href="#" className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
-                  ✓ {BRAND.version} (latest)
-                </a>
-                <a href="#" className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
-                  v0.9
-                </a>
-                <a href="#" className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
-                  v0.8
-                </a>
+            {/* Languages dropdown */}
+            {showLanguageMenu && (
+              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg p-2 border border-slate-200 dark:border-slate-700 z-50 min-w-[140px]">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setCurrentLanguage(lang);
+                      setShowLanguageMenu(false);
+                    }}
+                    className={`flex items-center gap-3 w-full px-3 py-2 text-sm transition rounded ${
+                      currentLanguage.code === lang.code 
+                        ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 font-medium' 
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.name}</span>
+                    {currentLanguage.code === lang.code && <i className="pi pi-check ml-auto text-[10px]"></i>}
+                  </button>
+                ))}
               </div>
             )}
           </li>
