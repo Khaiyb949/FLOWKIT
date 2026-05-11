@@ -223,7 +223,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
             />
 
             {/* Right: Controls & Main Action */}
-            <div className="flex flex-col gap-6 bg-card/60 backdrop-blur-xl p-6 rounded-[32px] border border-border shadow-2xl">
+            <div className="flex flex-col gap-6 bg-white dark:bg-zinc-950 p-6 rounded-[32px] border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none">
               <ImageControls
                 format={format}
                 onFormatChange={setFormat}
@@ -258,7 +258,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
               
               <div className="mt-2">
                 <Button
-                  className="w-full h-16 rounded-[20px] text-lg font-extrabold bg-[#4F8CFF] hover:bg-[#3B7EF8] text-white shadow-[0_10px_25px_-5px_rgba(79,140,255,0.4)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100"
+                  className="w-full h-16 rounded-[20px] text-lg font-extrabold bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white shadow-lg transition-all disabled:opacity-50 disabled:scale-100 active:scale-[0.98]"
                   onClick={convertAll}
                   disabled={isConverting || !items.length}
                 >
@@ -277,62 +277,55 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
               </div>
             </div>
           </div>
+
+          {items.length > 0 && (
+            <div className="w-full mt-4">
+              <ImageQueue
+                items={items}
+                format={format}
+                isConverting={isConverting}
+                progress={progress}
+                doneCount={doneCount}
+                errorCount={errorCount}
+                statusMessage={statusMessage}
+                onDownloadAll={downloadAll}
+                onClearAll={() => {
+                  clearAll();
+                  setStatusMessage(copy.messages.queueCleared);
+                }}
+                onDownloadItem={downloadItem}
+                onRemoveItem={removeItem}
+                disabled={isConverting}
+                labels={{
+                  kicker: copy.queue.kicker,
+                  title: copy.queue.title,
+                  downloadAll: copy.queue.downloadAll,
+                  clearQueue: copy.queue.clearQueue,
+                  progressReady: copy.queue.progressReady,
+                  progressFailed: copy.queue.progressFailed,
+                  emptyTitle: copy.queue.emptyTitle,
+                  emptyText: copy.queue.emptyText,
+                  reading: copy.fileCard.reading,
+                  remove: copy.fileCard.remove,
+                  outputSize: copy.fileCard.outputSize,
+                  saved: copy.fileCard.saved,
+                  download: copy.fileCard.download,
+                  openResult: copy.fileCard.openResult,
+                  fixFile: copy.status.fixFile,
+                  readyToConvert: copy.status.readyToConvert,
+                }}
+                statusLabels={{
+                  idle: copy.status.idle,
+                  converting: copy.status.converting,
+                  done: copy.status.done,
+                  error: copy.status.error,
+                }}
+              />
+            </div>
+          )}
         </section>
 
-        {items.length > 0 && (
-          <div className="flex flex-col gap-10">
-            <ImageStatGrid
-              itemCount={items.length}
-              totalBytes={totalBytes}
-              doneCount={doneCount}
-              queuedLabel={copy.hero.queuedFilesLabel}
-              inputSizeLabel={copy.hero.inputSizeLabel}
-              readyExportsLabel={copy.hero.readyExportsLabel}
-            />
-
-            <ImageQueue
-              items={items}
-              format={format}
-              isConverting={isConverting}
-              progress={progress}
-              doneCount={doneCount}
-              errorCount={errorCount}
-              statusMessage={statusMessage}
-              onDownloadAll={downloadAll}
-              onClearAll={() => {
-                clearAll();
-                setStatusMessage(copy.messages.queueCleared);
-              }}
-              onDownloadItem={downloadItem}
-              onRemoveItem={removeItem}
-              disabled={isConverting}
-              labels={{
-                kicker: copy.queue.kicker,
-                title: copy.queue.title,
-                downloadAll: copy.queue.downloadAll,
-                clearQueue: copy.queue.clearQueue,
-                progressReady: copy.queue.progressReady,
-                progressFailed: copy.queue.progressFailed,
-                emptyTitle: copy.queue.emptyTitle,
-                emptyText: copy.queue.emptyText,
-                reading: copy.fileCard.reading,
-                remove: copy.fileCard.remove,
-                outputSize: copy.fileCard.outputSize,
-                saved: copy.fileCard.saved,
-                download: copy.fileCard.download,
-                openResult: copy.fileCard.openResult,
-                fixFile: copy.status.fixFile,
-                readyToConvert: copy.status.readyToConvert,
-              }}
-              statusLabels={{
-                idle: copy.status.idle,
-                converting: copy.status.converting,
-                done: copy.status.done,
-                error: copy.status.error,
-              }}
-            />
-          </div>
-        )}
+        {/* Removed redundant items check below */}
       </div>
     </main>
   );

@@ -2,8 +2,9 @@
 
 import { Button } from '@/components/ui/button';
 import type { UploadItem, ImageFormat } from '@filekit/shared';
+import { formatBytes, calculateSavings } from '@filekit/shared';
 import { ImageFileCard } from './ImageFileCard';
-import { Image as ImageIcon, Download, Trash2 } from 'lucide-react';
+import { Image as ImageIcon, Download, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface ImageQueueProps {
   items: UploadItem[];
@@ -64,83 +65,142 @@ export function ImageQueue({
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold flex items-center gap-3">
-          <ImageIcon size={28} className="text-primary" />
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold flex items-center gap-2">
           {labels.title}
+          <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-full font-medium">
+            {items.length}
+          </span>
         </h2>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Button 
             type="button" 
-            className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold transition-all disabled:opacity-50"
+            variant="outline"
+            size="sm"
+            className="h-9 px-4 rounded-lg font-bold border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all text-xs"
             onClick={onDownloadAll} 
             disabled={!doneCount}
           >
-            <Download size={18} />
-            {labels.downloadAll}
+            <Download size={14} className="mr-1.5" />
+            Tải về tất cả
           </Button>
           <Button 
             type="button" 
             variant="ghost"
-            className="flex items-center gap-2 px-5 py-2 bg-muted/30 hover:bg-muted text-foreground border border-border rounded-xl font-bold transition-all disabled:opacity-50"
+            size="sm"
+            className="h-9 w-9 p-0 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all"
             onClick={onClearAll} 
             disabled={!items.length || isConverting}
+            title="Làm sạch danh sách"
           >
-            <Trash2 size={18} />
-            {labels.clearQueue}
+            <Trash2 size={16} />
           </Button>
         </div>
       </div>
 
-      <div className="bg-card/60 border border-border backdrop-blur-xl p-5 rounded-3xl" aria-live="polite">
-        <div className="flex justify-between gap-3 mb-3 text-sm text-muted-foreground">
-          <span>{statusMessage}</span>
-          <span className="font-bold">
-            {isConverting ? `${conversionProgress}%` : `${doneCount} ${labels.progressReady} • ${errorCount} ${labels.progressFailed}`}
-          </span>
+      <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm shadow-zinc-200/50 dark:shadow-none" aria-live="polite">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[600px]">
+            <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
+              <tr>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Hình ảnh</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Định dạng</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 w-[120px]">Kích thước</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Trạng thái</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 w-[50px]"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {items.length > 0 ? (
+                items.map((item) => (
+                  <tr key={item.id} className="group hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30 transition-colors">
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+                          {item.previewUrl ? (
+                            <img src={item.previewUrl} alt={item.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-zinc-400">
+                              <ImageIcon size={18} />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-sm font-semibold truncate max-w-[150px] text-zinc-700 dark:text-zinc-300" title={item.name}>
+                          {item.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
+                      <code className="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded uppercase">
+                        {item.file.type.split('/')[1]?.toUpperCase() || 'IMG'}
+                      </code>
+                    </td>
+                    <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400 font-medium font-mono">
+                      {formatBytes(item.file.size)}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-2">
+                        {item.status === 'done' && <CheckCircle2 size={14} className="text-green-500" />}
+                        {item.status === 'error' && <AlertCircle size={14} className="text-red-500" />}
+                        {item.status === 'converting' && <div className="w-3 h-3 border-2 border-zinc-200 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin" />}
+                        
+                        <div className="flex flex-col">
+                          <span className={`text-sm font-semibold ${
+                            item.status === 'done' ? 'text-zinc-900 dark:text-zinc-100' : 
+                            item.status === 'error' ? 'text-red-600' : 
+                            item.status === 'converting' ? 'text-blue-600' : 
+                            'text-zinc-400'
+                          }`}>
+                            {item.status === 'idle' && (item.error ? labels.fixFile : labels.readyToConvert)}
+                            {item.status === 'converting' && statusLabels.converting}
+                            {item.status === 'done' && statusLabels.done}
+                            {item.status === 'error' && statusLabels.error}
+                          </span>
+                          {item.status === 'done' && item.resultSize && (
+                            <span className="text-[10px] font-bold text-green-600 uppercase tracking-tight">
+                              Tiết kiệm {calculateSavings(item.resultSize, item.file.size).savedPercent}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <button
+                        onClick={() => onRemoveItem(item.id)}
+                        disabled={isConverting}
+                        className="p-1.5 text-zinc-300 hover:text-red-500 transition-colors disabled:opacity-0"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-5 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-800">
+                        <ImageIcon size={24} />
+                      </div>
+                      <p className="text-sm text-zinc-400 font-medium italic">Tiếp tục kéo thả ảnh vào đây để bắt đầu</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full transition-all duration-300 ease-out" 
-            style={{ width: `${conversionProgress}%` }} 
-          />
-        </div>
-      </div>
 
-      {items.length === 0 ? (
-        <div className="bg-card/40 border border-dashed border-border p-16 rounded-[40px] text-center flex flex-col items-center gap-5">
-          <div className="text-muted-foreground/40">
-            <ImageIcon size={64} strokeWidth={1} />
-          </div>
-          <h3 className="text-xl font-bold m-0">{labels.emptyTitle}</h3>
-          <p className="text-muted-foreground max-w-[45ch] m-0 leading-relaxed font-medium">{labels.emptyText}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {items.map((item) => (
-            <ImageFileCard
-              key={item.id}
-              item={item}
-              format={format}
-              onDownload={onDownloadItem}
-              onRemove={onRemoveItem}
-              disabled={disabled}
-              labels={{
-                reading: labels.reading,
-                remove: labels.remove,
-                outputSize: labels.outputSize,
-                saved: labels.saved,
-                download: labels.download,
-                openResult: labels.openResult,
-                fixFile: labels.fixFile,
-                readyToConvert: labels.readyToConvert,
-              }}
-              statusLabels={statusLabels}
+        {isConverting && (
+          <div className="h-1 bg-zinc-100 dark:bg-zinc-900 overflow-hidden lg:block">
+            <div 
+              className="h-full bg-zinc-900 dark:bg-zinc-100 transition-all duration-300 ease-in-out" 
+              style={{ width: `${conversionProgress}%` }}
             />
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
