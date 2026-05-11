@@ -23,6 +23,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
 
   // Initialize state first
   const [dragging, setDragging] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [statusMessage, setStatusMessage] = useState(copy.dropzone.hint);
 
   // Then use custom hooks with callbacks
