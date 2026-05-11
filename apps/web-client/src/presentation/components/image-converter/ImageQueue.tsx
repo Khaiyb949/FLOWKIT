@@ -1,10 +1,11 @@
 'use client';
 
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import type { UploadItem, ImageFormat } from '@filekit/shared';
 import { formatBytes, calculateSavings } from '@filekit/shared';
 import { ImageFileCard } from './ImageFileCard';
-import { Image as ImageIcon, Download, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Image as ImageIcon, Download, Trash2, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
 
 interface ImageQueueProps {
   items: UploadItem[];
@@ -19,6 +20,11 @@ interface ImageQueueProps {
   onDownloadItem: (item: UploadItem) => void;
   onRemoveItem: (id: string) => void;
   onConvertItem: (id: string) => void;
+  selectedIds: string[];
+  onSelectionChange: (ids: string[]) => void;
+  onDeleteSelected: () => void;
+  onConvertSelected: () => void;
+  onDownloadSelected: () => void;
   disabled?: boolean;
   labels: {
     kicker: string;
@@ -59,21 +65,73 @@ export function ImageQueue({
   onDownloadItem,
   onRemoveItem,
   onConvertItem,
+  selectedIds,
+  onSelectionChange,
+  onDeleteSelected,
+  onConvertSelected,
+  onDownloadSelected,
   disabled,
   labels,
   statusLabels,
 }: ImageQueueProps) {
   const conversionProgress = isConverting && progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
+  const toggleAll = (checked: boolean) => {
+    if (checked) {
+      onSelectionChange(items.map(i => i.id));
+    } else {
+      onSelectionChange([]);
+    }
+  };
+
+  const toggleItem = (id: string, checked: boolean) => {
+    if (checked) {
+      onSelectionChange([...selectedIds, id]);
+    } else {
+      onSelectionChange(selectedIds.filter(i => i !== id));
+    }
+  };
+
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          {labels.title}
-          <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-full font-medium">
-            {items.length}
-          </span>
-        </h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            {labels.title}
+            <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-full font-medium">
+              {items.length}
+            </span>
+          </h2>
+
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Đã chọn {selectedIds.length}</span>
+              <div className="flex gap-1 h-8 bg-zinc-100 dark:bg-zinc-900 rounded-lg p-1 border border-zinc-200 dark:border-zinc-800">
+                <button
+                  onClick={onConvertSelected}
+                  className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
+                  title="Chuyển đổi các mục đã chọn"
+                >
+                  <Zap size={14} />
+                </button>
+                <button
+                  onClick={onDownloadSelected}
+                  className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-green-600 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
+                  title="Tải về các mục đã chọn"
+                >
+                  <Download size={14} />
+                </button>
+                <button
+                  onClick={onDeleteSelected}
+                  className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
+                  title="Xóa các mục đã chọn"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="flex gap-2">
           <Button 
@@ -120,6 +178,13 @@ export function ImageQueue({
           <table className="w-full text-left border-collapse min-w-[600px]">
             <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
               <tr>
+                <th className="px-5 py-3 w-[40px]">
+                  <Checkbox 
+                    checked={selectedIds.length === items.length && items.length > 0}
+                    onCheckedChange={(checked) => toggleAll(!!checked)}
+                    aria-label="Chọn tất cả"
+                  />
+                </th>
                 <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Hình ảnh</th>
                 <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Định dạng</th>
                 <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 w-[120px]">Kích thước</th>
@@ -130,7 +195,14 @@ export function ImageQueue({
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {items.length > 0 ? (
                 items.map((item) => (
-                  <tr key={item.id} className="group hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30 transition-colors">
+                  <tr key={item.id} className={`group hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30 transition-colors ${selectedIds.includes(item.id) ? 'bg-zinc-50/50 dark:bg-zinc-900/50' : ''}`}>
+                    <td className="px-5 py-3">
+                      <Checkbox 
+                        checked={selectedIds.includes(item.id)}
+                        onCheckedChange={(checked) => toggleItem(item.id, !!checked)}
+                        aria-label={`Chọn ${item.name}`}
+                      />
+                    </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
@@ -182,13 +254,35 @@ export function ImageQueue({
                       </div>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <button
-                        onClick={() => onRemoveItem(item.id)}
-                        disabled={isConverting}
-                        className="p-1.5 text-zinc-300 hover:text-red-500 transition-colors disabled:opacity-0"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {item.status === 'idle' && (
+                          <button
+                            onClick={() => onConvertItem(item.id)}
+                            disabled={isConverting}
+                            className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                            title="Chuyển đổi"
+                          >
+                            <Zap size={14} />
+                          </button>
+                        )}
+                        {item.status === 'done' && (
+                          <button
+                            onClick={() => onDownloadItem(item)}
+                            className="p-1.5 text-zinc-400 hover:text-green-600 transition-colors"
+                            title="Tải về"
+                          >
+                            <Download size={14} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => onRemoveItem(item.id)}
+                          disabled={isConverting}
+                          className="p-1.5 text-zinc-300 hover:text-red-500 transition-colors"
+                          title="Xóa"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

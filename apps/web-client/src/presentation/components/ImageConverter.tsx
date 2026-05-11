@@ -23,6 +23,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
   const [dragging, setDragging] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [statusMessage, setStatusMessage] = useState(copy.dropzone.hint);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Then use custom hooks with callbacks
   const { items, itemsRef, addFiles, removeItem, updateItem, clearAll, cleanupUrls } = useImageUpload();
@@ -198,6 +199,29 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
     });
   };
 
+  const deleteSelected = () => {
+    selectedIds.forEach(id => removeItem(id));
+    setSelectedIds([]);
+  };
+
+  const convertSelected = async () => {
+    const toConvert = itemsRef.current.filter(item => selectedIds.includes(item.id) && item.status !== 'done');
+    if (toConvert.length === 0) return;
+
+    const settings: ImageConversionSettings = getConversionSettings();
+    
+    for (const item of toConvert) {
+      await convertItem(item.id);
+    }
+  };
+
+  const downloadSelected = () => {
+    const toDownload = itemsRef.current.filter(item => selectedIds.includes(item.id) && item.resultUrl);
+    toDownload.forEach((item, index) => {
+      window.setTimeout(() => downloadItem(item), index * 120);
+    });
+  };
+
   if (!mounted) {
     return (
       <main className="relative min-h-screen bg-transparent text-foreground px-5 py-20 overflow-hidden font-sans antialiased tracking-tight">
@@ -270,6 +294,12 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
                     }}
                     onDownloadItem={downloadItem}
                     onRemoveItem={removeItem}
+                    onConvertItem={convertItem}
+                    selectedIds={selectedIds}
+                    onSelectionChange={setSelectedIds}
+                    onDeleteSelected={deleteSelected}
+                    onConvertSelected={convertSelected}
+                    onDownloadSelected={downloadSelected}
                     disabled={isConverting}
                     labels={{
                       kicker: copy.queue.kicker,
