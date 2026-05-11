@@ -180,18 +180,6 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
       <div className={styles.shell}>
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <div className={styles.languageRow}>
-              <span className={styles.languageLabel}>{copy.languageLabel}</span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => router.push(locale === 'en' ? '/vi' : '/en')}
-              >
-                {copy.switchTo}
-              </Button>
-            </div>
-
             <p className={styles.kicker}>{copy.hero.kicker}</p>
             <h1 className={styles.title}>{copy.hero.title}</h1>
             <p className={styles.subtitle}>{copy.hero.subtitle}</p>

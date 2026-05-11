@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { PRIMARY_COLORS, BRAND, SOCIAL_LINKS, TOPBAR_CSS_VARIABLES } from '../constants/theme';
 // @ts-ignore - CSS module import
 import './TopBar.css';
 
 export const TopBar = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isDark, setIsDark] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [primaryColor, setPrimaryColor] = useState<typeof PRIMARY_COLORS[number]>(PRIMARY_COLORS[0]);
-  const [currentLanguage, setCurrentLanguage] = useState({ code: 'en', name: 'English', flag: '🇺🇸' });
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -19,6 +21,10 @@ export const TopBar = () => {
     { code: 'ja', name: '日本語', flag: '🇯🇵' },
     { code: 'ko', name: '한국어', flag: '🇰🇷' },
   ];
+
+  // Resolve current language from pathname
+  const currentLangCode = pathname?.split('/')[1] || 'en';
+  const currentLanguage = languages.find(lang => lang.code === currentLangCode) || languages[0];
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
@@ -255,7 +261,10 @@ export const TopBar = () => {
                   <button
                     key={lang.code}
                     onClick={() => {
-                      setCurrentLanguage(lang);
+                      // Switch language via routing
+                      const segments = pathname.split('/');
+                      segments[1] = lang.code;
+                      router.push(segments.join('/'));
                       setShowLanguageMenu(false);
                     }}
                     className={`flex items-center gap-3 w-full px-3 py-2 text-sm transition rounded ${
