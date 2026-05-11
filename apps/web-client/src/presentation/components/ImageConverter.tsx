@@ -207,20 +207,96 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 w-full items-start">
-            {/* Left: Dropzone - The Main Focus */}
-            <ImageDropzone
-              dragging={dragging}
-              onDragOver={() => setDragging(true)}
-              onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => inputRef.current?.click()}
-              disabled={isConverting}
-              inputRef={inputRef}
-              onFileChange={handleFileChange}
-              label={copy.dropzone.label}
-              hint={copy.dropzone.hint}
-              footnote={copy.dropzone.footnote}
-            />
+            {/* Left Column: Dropzone or Queue */}
+            <div className="w-full">
+              {items.length === 0 ? (
+                <ImageDropzone
+                  dragging={dragging}
+                  onDragOver={() => setDragging(true)}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => inputRef.current?.click()}
+                  disabled={isConverting}
+                  inputRef={inputRef}
+                  onFileChange={handleFileChange}
+                  label={copy.dropzone.label}
+                  hint={copy.dropzone.hint}
+                  footnote={copy.dropzone.footnote}
+                />
+              ) : (
+                <div 
+                  className="flex flex-col gap-4 relative group"
+                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={handleDrop}
+                >
+                  <ImageQueue
+                    items={items}
+                    format={format}
+                    isConverting={isConverting}
+                    progress={progress}
+                    doneCount={doneCount}
+                    errorCount={errorCount}
+                    statusMessage={statusMessage}
+                    onDownloadAll={downloadAll}
+                    onClearAll={() => {
+                      clearAll();
+                      setStatusMessage(copy.messages.queueCleared);
+                    }}
+                    onDownloadItem={downloadItem}
+                    onRemoveItem={removeItem}
+                    disabled={isConverting}
+                    labels={{
+                      kicker: copy.queue.kicker,
+                      title: copy.queue.title,
+                      downloadAll: copy.queue.downloadAll,
+                      clearQueue: copy.queue.clearQueue,
+                      progressReady: copy.queue.progressReady,
+                      progressFailed: copy.queue.progressFailed,
+                      emptyTitle: copy.queue.emptyTitle,
+                      emptyText: copy.queue.emptyText,
+                      reading: copy.fileCard.reading,
+                      remove: copy.fileCard.remove,
+                      outputSize: copy.fileCard.outputSize,
+                      saved: copy.fileCard.saved,
+                      download: copy.fileCard.download,
+                      openResult: copy.fileCard.openResult,
+                      fixFile: copy.status.fixFile,
+                      readyToConvert: copy.status.readyToConvert,
+                    }}
+                    statusLabels={{
+                      idle: copy.status.idle,
+                      converting: copy.status.converting,
+                      done: copy.status.done,
+                      error: copy.status.error,
+                    }}
+                  />
+                  
+                  {/* Drop Overlay when dragging over the table */}
+                  {dragging && (
+                    <div className="absolute inset-0 z-50 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-[2px] border-2 border-dashed border-zinc-900 dark:border-zinc-100 rounded-xl flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200">
+                      <div className="w-16 h-16 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center shadow-xl mb-4">
+                        <Zap size={32} />
+                      </div>
+                      <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100 italic">Thả để thêm ảnh vào danh sách</p>
+                    </div>
+                  )}
+
+                  {/* Add button below the table */}
+                  <div className="flex justify-center -mt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => inputRef.current?.click()}
+                      disabled={isConverting}
+                      className="rounded-full px-6 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 font-bold text-xs h-9 transition-all active:scale-95 shadow-sm"
+                    >
+                      + Thêm hình ảnh
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Right: Controls & Main Action */}
             <div className="flex flex-col gap-6 bg-white dark:bg-zinc-950 p-6 rounded-[32px] border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none">
@@ -277,55 +353,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
               </div>
             </div>
           </div>
-
-          {items.length > 0 && (
-            <div className="w-full mt-4">
-              <ImageQueue
-                items={items}
-                format={format}
-                isConverting={isConverting}
-                progress={progress}
-                doneCount={doneCount}
-                errorCount={errorCount}
-                statusMessage={statusMessage}
-                onDownloadAll={downloadAll}
-                onClearAll={() => {
-                  clearAll();
-                  setStatusMessage(copy.messages.queueCleared);
-                }}
-                onDownloadItem={downloadItem}
-                onRemoveItem={removeItem}
-                disabled={isConverting}
-                labels={{
-                  kicker: copy.queue.kicker,
-                  title: copy.queue.title,
-                  downloadAll: copy.queue.downloadAll,
-                  clearQueue: copy.queue.clearQueue,
-                  progressReady: copy.queue.progressReady,
-                  progressFailed: copy.queue.progressFailed,
-                  emptyTitle: copy.queue.emptyTitle,
-                  emptyText: copy.queue.emptyText,
-                  reading: copy.fileCard.reading,
-                  remove: copy.fileCard.remove,
-                  outputSize: copy.fileCard.outputSize,
-                  saved: copy.fileCard.saved,
-                  download: copy.fileCard.download,
-                  openResult: copy.fileCard.openResult,
-                  fixFile: copy.status.fixFile,
-                  readyToConvert: copy.status.readyToConvert,
-                }}
-                statusLabels={{
-                  idle: copy.status.idle,
-                  converting: copy.status.converting,
-                  done: copy.status.done,
-                  error: copy.status.error,
-                }}
-              />
-            </div>
-          )}
         </section>
-
-        {/* Removed redundant items check below */}
       </div>
     </main>
   );
