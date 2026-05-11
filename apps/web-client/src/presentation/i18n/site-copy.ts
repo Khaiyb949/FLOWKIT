@@ -187,9 +187,9 @@ const COPY: Record<Locale, ClientCopy> = {
     switchTo: 'English',
     hero: {
       kicker: 'Công cụ chuyển ảnh ưu tiên trình duyệt, dùng NestJS ở backend',
-      title: 'FrameShift chuyển đổi và nén hàng loạt ảnh chuyên nghiệp.',
+      title: 'FrameShift. Chuyển đổi và nén hàng loạt ảnh chuyên nghiệp.',
       subtitle:
-        'Tải lên file JPG, PNG, WebP, AVIF, TIFF, GIF, HEIF, JP2, JXL, PDF hoặc SVG, đổi kích thước nhanh chóng và tải kết quả chất lượng cao ngay lập tức. Tối ưu hoá cho hiệu suất và trải nghiệm của bạn.',
+        'Tải lên file JPG, PNG, WebP, AVIF, TIFF, GIF, HEIF, JP2, JXL, PDF hoặc SVG, đổi kích thước nhanh chóng và tải kết quả chất lượng cao ngay lập tức.',
       badges: ['Tải lên hàng loạt', 'Chất lượng cao', 'Preset kích thước', 'Đã bỏ metadata'],
       primaryAction: 'Thêm ảnh',
       secondaryAction: 'Chuyển đổi tất cả',

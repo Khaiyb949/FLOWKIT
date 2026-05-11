@@ -1,8 +1,7 @@
 "use client";
 
+import { Zap, Shield, HelpCircle } from 'lucide-react';
 import { type ChangeEvent, type DragEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from '../../app/page.module.css';
 import type { ImageConversionSettings } from '../../application/image-conversion.types';
 import { convertImage } from '../../infrastructure/image-processing-api';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,6 @@ type ImageConverterProps = {
 };
 
 export default function ImageConverter({ locale }: ImageConverterProps) {
-  const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const copy = useMemo(() => getClientCopy(locale), [locale]);
 
@@ -177,13 +175,16 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
 
   if (!mounted) {
     return (
-      <main className={styles.page}>
-        <div className={styles.backdrop} />
-        <div className={styles.shell}>
-          <section className={styles.hero}>
-            <div className={styles.heroCopy}>
-              <h1 className={styles.title}>{copy.hero.title}</h1>
-              <p className={styles.subtitle}>{copy.hero.subtitle}</p>
+      <main className="relative min-h-screen bg-transparent text-foreground px-5 py-20 overflow-hidden font-sans antialiased tracking-tight">
+        <div className="relative z-10 max-w-[1280px] mx-auto flex flex-col gap-16">
+          <section className="flex flex-col items-center gap-12 pt-6">
+            <div className="flex flex-col items-center">
+              <h1 className="text-5xl md:text-6xl font-extrabold text-center leading-tight tracking-tight mb-4">
+                {copy.hero.title}
+              </h1>
+              <p className="text-center mt-0 mb-8 text-muted-foreground font-medium text-xl leading-relaxed max-w-[800px]">
+                {copy.hero.subtitle}
+              </p>
             </div>
           </section>
         </div>
@@ -192,52 +193,21 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
   }
 
   return (
-    <main className={styles.page}>
-      <div className={styles.backdrop} />
-
-      <div className={styles.shell}>
-        <section className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <h1 className={styles.title}>{copy.hero.title}</h1>
-            <p className={styles.subtitle}>{copy.hero.subtitle}</p>
-
-            <div className={styles.badges} aria-label="Feature highlights">
-              {copy.hero.badges.map((badge) => (
-                <span key={badge} className={styles.badge}>
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <div className={styles.buttonRow}>
-              <Button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                disabled={isConverting}
-              >
-                {copy.hero.primaryAction}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={convertAll}
-                disabled={isConverting || !items.length}
-              >
-                {isConverting ? copy.status.converting : copy.hero.secondaryAction}
-              </Button>
-            </div>
-
-            <ImageStatGrid
-              itemCount={items.length}
-              totalBytes={totalBytes}
-              doneCount={doneCount}
-              queuedLabel={copy.hero.queuedFilesLabel}
-              inputSizeLabel={copy.hero.inputSizeLabel}
-              readyExportsLabel={copy.hero.readyExportsLabel}
-            />
+    <main className="relative min-h-screen bg-transparent text-foreground px-5 py-20 overflow-hidden font-sans antialiased tracking-tight">
+      <div className="relative z-10 max-w-[1280px] mx-auto flex flex-col gap-16">
+        {/* Prime-inspired Modern Hero */}
+        <section className="flex flex-col items-center gap-12">
+          <div className="flex flex-col items-center gap-6">
+            <h1 className="text-5xl font-bold text-center xl:text-left leading-tight">
+              {copy.hero.title}
+            </h1>
+            <p className="text-center mt-0 mb-8 text-surface-500 dark:text-surface-400 font-medium text-xl leading-relaxed lg:px-56">
+              {copy.hero.subtitle}
+            </p>
           </div>
 
-          <aside className={styles.panel}>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 w-full items-start">
+            {/* Left: Dropzone - The Main Focus */}
             <ImageDropzone
               dragging={dragging}
               onDragOver={() => setDragging(true)}
@@ -252,80 +222,117 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
               footnote={copy.dropzone.footnote}
             />
 
-            <ImageControls
-              format={format}
-              onFormatChange={setFormat}
-              quality={quality}
-              onQualityChange={setQuality}
-              sizeMode={sizeMode}
-              onSizeModeChange={syncSizeMode}
-              customWidth={customWidth}
-              onCustomWidthChange={setCustomWidth}
-              customHeight={customHeight}
-              onCustomHeightChange={setCustomHeight}
-              keepAspectRatio={keepAspectRatio}
-              onKeepAspectRatioChange={setKeepAspectRatio}
-              targetPreview={targetPreview}
-              disabled={isConverting}
-              labels={{
-                outputFormat: copy.controls.outputFormat,
-                formatPlaceholder: copy.controls.formatPlaceholder,
-                formatPopular: copy.controls.formatPopular,
-                formatAll: copy.controls.formatAll,
-                sizePreset: copy.controls.sizePreset,
-                sizePlaceholder: copy.controls.sizePlaceholder,
-                width: copy.controls.width,
-                height: copy.controls.height,
-                preserveAspectRatio: copy.controls.preserveAspectRatio,
-                quality: copy.controls.quality,
-                currentTarget: copy.controls.currentTarget,
-                metadataNote: copy.controls.metadataNote,
-              }}
-            />
-          </aside>
+            {/* Right: Controls & Main Action */}
+            <div className="flex flex-col gap-6 bg-card/60 backdrop-blur-xl p-6 rounded-[32px] border border-border shadow-2xl">
+              <ImageControls
+                format={format}
+                onFormatChange={setFormat}
+                quality={quality}
+                onQualityChange={setQuality}
+                sizeMode={sizeMode}
+                onSizeModeChange={syncSizeMode}
+                customWidth={customWidth}
+                onCustomWidthChange={setCustomWidth}
+                customHeight={customHeight}
+                onCustomHeightChange={setCustomHeight}
+                keepAspectRatio={keepAspectRatio}
+                onKeepAspectRatioChange={setKeepAspectRatio}
+                targetPreview={targetPreview}
+                disabled={isConverting}
+                labels={{
+                  outputFormat: copy.controls.outputFormat,
+                  formatPlaceholder: copy.controls.formatPlaceholder,
+                  formatPopular: copy.controls.formatPopular,
+                  formatAll: copy.controls.formatAll,
+                  sizePreset: copy.controls.sizePreset,
+                  sizePlaceholder: copy.controls.sizePlaceholder,
+                  width: copy.controls.width,
+                  height: copy.controls.height,
+                  preserveAspectRatio: copy.controls.preserveAspectRatio,
+                  quality: copy.controls.quality,
+                  currentTarget: copy.controls.currentTarget,
+                  metadataNote: copy.controls.metadataNote,
+                  searchPlaceholder: copy.controls.searchPlaceholder || 'Tìm kiếm định dạng...',
+                }}
+              />
+              
+              <div className="mt-2">
+                <Button
+                  className="w-full h-16 rounded-[20px] text-lg font-extrabold bg-[#4F8CFF] hover:bg-[#3B7EF8] text-white shadow-[0_10px_25px_-5px_rgba(79,140,255,0.4)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100"
+                  onClick={convertAll}
+                  disabled={isConverting || !items.length}
+                >
+                  {isConverting ? (
+                    <span className="flex items-center gap-2">
+                       <Zap className="animate-pulse" size={20} />
+                       {copy.status.converting}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                       <Zap size={20} />
+                       {copy.hero.secondaryAction}
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <ImageQueue
-          items={items}
-          format={format}
-          isConverting={isConverting}
-          progress={progress}
-          doneCount={doneCount}
-          errorCount={errorCount}
-          statusMessage={statusMessage}
-          onDownloadAll={downloadAll}
-          onClearAll={() => {
-            clearAll();
-            setStatusMessage(copy.messages.queueCleared);
-          }}
-          onDownloadItem={downloadItem}
-          onRemoveItem={removeItem}
-          disabled={isConverting}
-          labels={{
-            kicker: copy.queue.kicker,
-            title: copy.queue.title,
-            downloadAll: copy.queue.downloadAll,
-            clearQueue: copy.queue.clearQueue,
-            progressReady: copy.queue.progressReady,
-            progressFailed: copy.queue.progressFailed,
-            emptyTitle: copy.queue.emptyTitle,
-            emptyText: copy.queue.emptyText,
-            reading: copy.fileCard.reading,
-            remove: copy.fileCard.remove,
-            outputSize: copy.fileCard.outputSize,
-            saved: copy.fileCard.saved,
-            download: copy.fileCard.download,
-            openResult: copy.fileCard.openResult,
-            fixFile: copy.status.fixFile,
-            readyToConvert: copy.status.readyToConvert,
-          }}
-          statusLabels={{
-            idle: copy.status.idle,
-            converting: copy.status.converting,
-            done: copy.status.done,
-            error: copy.status.error,
-          }}
-        />
+        {items.length > 0 && (
+          <div className="flex flex-col gap-10">
+            <ImageStatGrid
+              itemCount={items.length}
+              totalBytes={totalBytes}
+              doneCount={doneCount}
+              queuedLabel={copy.hero.queuedFilesLabel}
+              inputSizeLabel={copy.hero.inputSizeLabel}
+              readyExportsLabel={copy.hero.readyExportsLabel}
+            />
+
+            <ImageQueue
+              items={items}
+              format={format}
+              isConverting={isConverting}
+              progress={progress}
+              doneCount={doneCount}
+              errorCount={errorCount}
+              statusMessage={statusMessage}
+              onDownloadAll={downloadAll}
+              onClearAll={() => {
+                clearAll();
+                setStatusMessage(copy.messages.queueCleared);
+              }}
+              onDownloadItem={downloadItem}
+              onRemoveItem={removeItem}
+              disabled={isConverting}
+              labels={{
+                kicker: copy.queue.kicker,
+                title: copy.queue.title,
+                downloadAll: copy.queue.downloadAll,
+                clearQueue: copy.queue.clearQueue,
+                progressReady: copy.queue.progressReady,
+                progressFailed: copy.queue.progressFailed,
+                emptyTitle: copy.queue.emptyTitle,
+                emptyText: copy.queue.emptyText,
+                reading: copy.fileCard.reading,
+                remove: copy.fileCard.remove,
+                outputSize: copy.fileCard.outputSize,
+                saved: copy.fileCard.saved,
+                download: copy.fileCard.download,
+                openResult: copy.fileCard.openResult,
+                fixFile: copy.status.fixFile,
+                readyToConvert: copy.status.readyToConvert,
+              }}
+              statusLabels={{
+                idle: copy.status.idle,
+                converting: copy.status.converting,
+                done: copy.status.done,
+                error: copy.status.error,
+              }}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

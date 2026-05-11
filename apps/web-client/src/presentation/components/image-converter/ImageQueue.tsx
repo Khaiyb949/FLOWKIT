@@ -1,9 +1,9 @@
 'use client';
 
-import styles from '../../../app/page.module.css';
 import { Button } from '@/components/ui/button';
 import type { UploadItem, ImageFormat } from '@filekit/shared';
 import { ImageFileCard } from './ImageFileCard';
+import { Image as ImageIcon, Download, Trash2 } from 'lucide-react';
 
 interface ImageQueueProps {
   items: UploadItem[];
@@ -63,42 +63,61 @@ export function ImageQueue({
   const conversionProgress = isConverting && progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
-    <section className={styles.fileSection}>
-      <div className={styles.sectionHeader}>
-        <div>
-          <p className={styles.sectionKicker}>{labels.kicker}</p>
-          <h2 className={styles.sectionTitle}>{labels.title}</h2>
-        </div>
+    <section className="flex flex-col gap-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold flex items-center gap-3">
+          <ImageIcon size={28} className="text-primary" />
+          {labels.title}
+        </h2>
 
-        <div className={styles.sectionActions}>
-          <Button type="button" variant="outline" onClick={onDownloadAll} disabled={!doneCount}>
+        <div className="flex gap-3">
+          <Button 
+            type="button" 
+            className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold transition-all disabled:opacity-50"
+            onClick={onDownloadAll} 
+            disabled={!doneCount}
+          >
+            <Download size={18} />
             {labels.downloadAll}
           </Button>
-          <Button type="button" variant="outline" onClick={onClearAll} disabled={!items.length || isConverting}>
+          <Button 
+            type="button" 
+            variant="ghost"
+            className="flex items-center gap-2 px-5 py-2 bg-muted/30 hover:bg-muted text-foreground border border-border rounded-xl font-bold transition-all disabled:opacity-50"
+            onClick={onClearAll} 
+            disabled={!items.length || isConverting}
+          >
+            <Trash2 size={18} />
             {labels.clearQueue}
           </Button>
         </div>
       </div>
 
-      <div className={styles.progressCard} aria-live="polite">
-        <div className={styles.progressTopRow}>
+      <div className="bg-card/60 border border-border backdrop-blur-xl p-5 rounded-3xl" aria-live="polite">
+        <div className="flex justify-between gap-3 mb-3 text-sm text-muted-foreground">
           <span>{statusMessage}</span>
-          <span>
+          <span className="font-bold">
             {isConverting ? `${conversionProgress}%` : `${doneCount} ${labels.progressReady} • ${errorCount} ${labels.progressFailed}`}
           </span>
         </div>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${conversionProgress}%` }} />
+        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full transition-all duration-300 ease-out" 
+            style={{ width: `${conversionProgress}%` }} 
+          />
         </div>
       </div>
 
       {items.length === 0 ? (
-        <div className={styles.emptyState}>
-          <h3>{labels.emptyTitle}</h3>
-          <p>{labels.emptyText}</p>
+        <div className="bg-card/40 border border-dashed border-border p-16 rounded-[40px] text-center flex flex-col items-center gap-5">
+          <div className="text-muted-foreground/40">
+            <ImageIcon size={64} strokeWidth={1} />
+          </div>
+          <h3 className="text-xl font-bold m-0">{labels.emptyTitle}</h3>
+          <p className="text-muted-foreground max-w-[45ch] m-0 leading-relaxed font-medium">{labels.emptyText}</p>
         </div>
       ) : (
-        <div className={styles.fileGrid}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {items.map((item) => (
             <ImageFileCard
               key={item.id}

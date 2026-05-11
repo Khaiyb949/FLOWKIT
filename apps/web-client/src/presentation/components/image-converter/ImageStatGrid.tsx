@@ -1,7 +1,5 @@
 'use client';
 
-import styles from '../../../app/page.module.css';
-
 interface ImageStatGridProps {
   itemCount: number;
   totalBytes: number;
@@ -27,18 +25,18 @@ export function ImageStatGrid({
   };
 
   return (
-    <div className={styles.statGrid} aria-label="Feature highlights">
-      <article className={styles.statCard}>
-        <strong>{itemCount}</strong>
-        <span>{queuedLabel}</span>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5" aria-label="Feature highlights">
+      <article className="bg-card/40 border border-border rounded-3xl p-6 text-center shadow-lg transition-transform hover:translate-y-[-2px]">
+        <strong className="block text-3xl font-extrabold text-primary mb-1">{itemCount}</strong>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{queuedLabel}</span>
       </article>
-      <article className={styles.statCard}>
-        <strong>{formatBytes(totalBytes)}</strong>
-        <span>{inputSizeLabel}</span>
+      <article className="bg-card/40 border border-border rounded-3xl p-6 text-center shadow-lg transition-transform hover:translate-y-[-2px]">
+        <strong className="block text-3xl font-extrabold text-primary mb-1">{formatBytes(totalBytes)}</strong>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{inputSizeLabel}</span>
       </article>
-      <article className={styles.statCard}>
-        <strong>{doneCount}</strong>
-        <span>{readyExportsLabel}</span>
+      <article className="bg-card/40 border border-border rounded-3xl p-6 text-center shadow-lg transition-transform hover:translate-y-[-2px]">
+        <strong className="block text-3xl font-extrabold text-primary mb-1">{doneCount}</strong>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{readyExportsLabel}</span>
       </article>
     </div>
   );
