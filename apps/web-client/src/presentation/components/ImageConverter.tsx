@@ -143,6 +143,31 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
     setStatusMessage(copy.messages.conversionFinished);
   };
 
+  const convertItem = async (id: string) => {
+    const item = itemsRef.current.find(i => i.id === id);
+    if (!item || item.status === 'converting') return;
+
+    const settings: ImageConversionSettings = getConversionSettings();
+    updateItem(item.id, { status: 'converting', error: null });
+
+    try {
+      const converted = await convertImage(item.file, settings);
+      const resultUrl = converted.url;
+      const resultName = buildTargetName(item.name, format);
+
+      updateItem(item.id, {
+        status: 'done',
+        resultUrl,
+        resultSize: converted.size,
+        resultName,
+        error: null,
+      });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : copy.messages.conversionFailed;
+      updateItem(item.id, { status: 'error', error: message });
+    }
+  };
+
   const downloadItem = (item: UploadItem) => {
     if (!item.resultUrl) {
       return;
@@ -281,19 +306,6 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
                       <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100 italic">Thả để thêm ảnh vào danh sách</p>
                     </div>
                   )}
-
-                  {/* Add button below the table */}
-                  <div className="flex justify-center -mt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => inputRef.current?.click()}
-                      disabled={isConverting}
-                      className="rounded-full px-6 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 font-bold text-xs h-9 transition-all active:scale-95 shadow-sm"
-                    >
-                      + Thêm hình ảnh
-                    </Button>
-                  </div>
                 </div>
               )}
             </div>

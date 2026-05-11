@@ -18,6 +18,7 @@ interface ImageQueueProps {
   onClearAll: () => void;
   onDownloadItem: (item: UploadItem) => void;
   onRemoveItem: (id: string) => void;
+  onConvertItem: (id: string) => void;
   disabled?: boolean;
   labels: {
     kicker: string;
@@ -57,6 +58,7 @@ export function ImageQueue({
   onClearAll,
   onDownloadItem,
   onRemoveItem,
+  onConvertItem,
   disabled,
   labels,
   statusLabels,
@@ -78,7 +80,21 @@ export function ImageQueue({
             type="button" 
             variant="outline"
             size="sm"
-            className="h-9 px-4 rounded-lg font-bold border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all text-xs"
+            className="h-9 px-4 rounded-lg font-bold border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100"
+            onClick={() => {
+              const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+              input?.click();
+            }}
+            disabled={isConverting}
+          >
+            <ImageIcon size={14} className="mr-1.5" />
+            Thêm ảnh
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline"
+            size="sm"
+            className="h-9 px-4 rounded-lg font-bold border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all text-xs bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100"
             onClick={onDownloadAll} 
             disabled={!doneCount}
           >
