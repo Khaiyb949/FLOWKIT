@@ -49,6 +49,7 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
 
   // Setup effects
   useEffect(() => {
+    setMounted(true);
     return cleanupUrls;
   }, [cleanupUrls]);
 
@@ -172,6 +173,23 @@ export default function ImageConverter({ locale }: ImageConverterProps) {
       }, index * 120);
     });
   };
+
+  if (!mounted) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.backdrop} />
+        <div className={styles.shell}>
+          <section className={styles.hero}>
+            <div className={styles.heroCopy}>
+              <p className={styles.kicker}>{copy.hero.kicker}</p>
+              <h1 className={styles.title}>{copy.hero.title}</h1>
+              <p className={styles.subtitle}>{copy.hero.subtitle}</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.page}>
