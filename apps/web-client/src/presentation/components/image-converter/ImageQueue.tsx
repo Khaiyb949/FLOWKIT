@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import type { UploadItem, ImageFormat } from '@filekit/shared';
 import { formatBytes, calculateSavings } from '@filekit/shared';
 import { ImageFileCard } from './ImageFileCard';
-import { Image as ImageIcon, Download, Trash2, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { Image as ImageIcon, Download, Trash2, CheckCircle2, AlertCircle, Zap, ArrowRight } from 'lucide-react';
 
 interface ImageQueueProps {
   items: UploadItem[];
@@ -105,26 +105,26 @@ export function ImageQueue({
 
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Đã chọn {selectedIds.length}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Selected {selectedIds.length}</span>
               <div className="flex gap-1 h-8 bg-zinc-100 dark:bg-zinc-900 rounded-lg p-1 border border-zinc-200 dark:border-zinc-800">
                 <button
                   onClick={onConvertSelected}
                   className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
-                  title="Chuyển đổi các mục đã chọn"
+                  title="Convert selected items"
                 >
                   <Zap size={14} />
                 </button>
                 <button
                   onClick={onDownloadSelected}
                   className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-green-600 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
-                  title="Tải về các mục đã chọn"
+                  title="Download selected items"
                 >
                   <Download size={14} />
                 </button>
                 <button
                   onClick={onDeleteSelected}
                   className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-white dark:hover:bg-zinc-800 rounded transition-all"
-                  title="Xóa các mục đã chọn"
+                  title="Remove selected items"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -146,7 +146,7 @@ export function ImageQueue({
             disabled={isConverting}
           >
             <ImageIcon size={14} className="mr-1.5" />
-            Thêm ảnh
+            Add images
           </Button>
           <Button 
             type="button" 
@@ -157,7 +157,7 @@ export function ImageQueue({
             disabled={!doneCount}
           >
             <Download size={14} className="mr-1.5" />
-            Tải về tất cả
+            Download all
           </Button>
           <Button 
             type="button" 
@@ -166,7 +166,7 @@ export function ImageQueue({
             className="h-9 w-9 p-0 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all"
             onClick={onClearAll} 
             disabled={!items.length || isConverting}
-            title="Làm sạch danh sách"
+            title="Clear list"
           >
             <Trash2 size={16} />
           </Button>
@@ -182,14 +182,14 @@ export function ImageQueue({
                   <Checkbox 
                     checked={selectedIds.length === items.length && items.length > 0}
                     onCheckedChange={(checked) => toggleAll(!!checked)}
-                    aria-label="Chọn tất cả"
+                    aria-label="Select all"
                   />
                 </th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Hình ảnh</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Định dạng</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 w-[120px]">Kích thước</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">Trạng thái</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 w-[50px]"></th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Image</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Format</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 w-[120px]">Size</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Status</th>
+                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 w-[50px]"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -220,12 +220,31 @@ export function ImageQueue({
                       </div>
                     </td>
                     <td className="px-5 py-3">
-                      <code className="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded uppercase">
-                        {item.file.type.split('/')[1]?.toUpperCase() || 'IMG'}
-                      </code>
+                      <div className="flex items-center gap-1.5">
+                        <code className="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded uppercase">
+                          {item.file.type.split('/')[1]?.toUpperCase() || 'IMG'}
+                        </code>
+                        {item.status === 'done' && (
+                          <>
+                            <ArrowRight size={10} className="text-zinc-400" />
+                            <code className="text-[10px] font-bold px-2 py-0.5 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded uppercase">
+                              {format.toUpperCase()}
+                            </code>
+                          </>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400 font-medium font-mono">
-                      {formatBytes(item.file.size)}
+                      <div className="flex flex-col gap-0.5">
+                        <span className={item.status === 'done' ? 'text-[10px] text-zinc-400 line-through' : ''}>
+                          {formatBytes(item.file.size)}
+                        </span>
+                        {item.status === 'done' && item.resultSize && (
+                          <span className="text-zinc-900 dark:text-zinc-100 font-bold">
+                            {formatBytes(item.resultSize)}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
@@ -247,7 +266,7 @@ export function ImageQueue({
                           </span>
                           {item.status === 'done' && item.resultSize && (
                             <span className="text-[10px] font-bold text-green-600 uppercase tracking-tight">
-                              Tiết kiệm {calculateSavings(item.resultSize, item.file.size).savedPercent}%
+                              Saved {calculateSavings(item.resultSize, item.file.size).savedPercent}%
                             </span>
                           )}
                         </div>
@@ -260,7 +279,7 @@ export function ImageQueue({
                             onClick={() => onConvertItem(item.id)}
                             disabled={isConverting}
                             className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                            title="Chuyển đổi"
+                            title="Convert"
                           >
                             <Zap size={14} />
                           </button>
@@ -269,7 +288,7 @@ export function ImageQueue({
                           <button
                             onClick={() => onDownloadItem(item)}
                             className="p-1.5 text-zinc-400 hover:text-green-600 transition-colors"
-                            title="Tải về"
+                            title="Download"
                           >
                             <Download size={14} />
                           </button>
@@ -278,7 +297,7 @@ export function ImageQueue({
                           onClick={() => onRemoveItem(item.id)}
                           disabled={isConverting}
                           className="p-1.5 text-zinc-300 hover:text-red-500 transition-colors"
-                          title="Xóa"
+                          title="Remove"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -293,7 +312,7 @@ export function ImageQueue({
                       <div className="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-800">
                         <ImageIcon size={24} />
                       </div>
-                      <p className="text-sm text-zinc-400 font-medium italic">Tiếp tục kéo thả ảnh vào đây để bắt đầu</p>
+                      <p className="text-sm text-zinc-400 font-medium italic">Continue dragging and dropping images here to start</p>
                     </div>
                   </td>
                 </tr>
