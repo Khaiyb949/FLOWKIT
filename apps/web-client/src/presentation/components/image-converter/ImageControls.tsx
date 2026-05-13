@@ -114,7 +114,7 @@ export function ImageControls({
             </div>
             {!hasSearchResults ? (
               <div className="py-6 text-center text-sm text-muted-foreground italic">
-                {searchTerm ? 'Không tìm thấy định dạng nào' : 'Danh sách trống'}
+                {searchTerm ? (labels.searchPlaceholder.includes('Tìm') ? 'Không tìm thấy định dạng nào' : 'No formats found') : (labels.searchPlaceholder.includes('Tìm') ? 'Danh sách trống' : 'List is empty')}
               </div>
             ) : (
               <>

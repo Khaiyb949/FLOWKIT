@@ -32,7 +32,7 @@ export function ImageDropzone({
 }: ImageDropzoneProps) {
   return (
     <div
-      className={`relative w-full min-h-[480px] rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out
+      className={`relative w-full min-h-[620px] rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ease-in-out
         ${dragging 
           ? 'border-primary bg-primary/10 scale-[1.01]' 
           : 'border-border bg-card/40 hover:border-primary hover:bg-primary/5 hover:shadow-[inset_0_0_60px_rgba(59,130,246,0.05)]'

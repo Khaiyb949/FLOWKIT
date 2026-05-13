@@ -2,6 +2,14 @@
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import type { UploadItem, ImageFormat } from '@filekit/shared';
 import { formatBytes, calculateSavings } from '@filekit/shared';
 import { ImageFileCard } from './ImageFileCard';
@@ -96,7 +104,7 @@ export function ImageQueue({
     <section className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-color text-3xl font-semibold leading-normal flex items-center gap-2">
             {labels.title}
             <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-full font-medium">
               {items.length}
@@ -175,150 +183,185 @@ export function ImageQueue({
 
       <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm shadow-zinc-200/50 dark:shadow-none" aria-live="polite">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[600px]">
-            <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-              <tr>
-                <th className="px-5 py-3 w-[40px]">
+          <Table className="min-w-[700px]">
+            <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
+              <TableRow className="border-b border-zinc-200 dark:border-zinc-800 hover:bg-transparent">
+                <TableHead className="px-6 h-14 w-[60px] text-center">
                   <Checkbox 
                     checked={selectedIds.length === items.length && items.length > 0}
                     onCheckedChange={(checked) => toggleAll(!!checked)}
                     aria-label="Select all"
                   />
-                </th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Image</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Format</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 w-[120px]">Size</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Status</th>
-                <th className="px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 w-[50px]"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                </TableHead>
+                <TableHead className="px-4 h-14 text-sm font-bold text-black dark:text-white">File Details</TableHead>
+                <TableHead className="px-4 h-14 text-sm font-bold text-black dark:text-white">Conversion</TableHead>
+                <TableHead className="px-4 h-14 text-sm font-bold text-black dark:text-white w-[160px]">File Size</TableHead>
+                <TableHead className="px-4 h-14 text-sm font-bold text-black dark:text-white">Status</TableHead>
+                <TableHead className="px-4 h-14 w-[110px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {items.length > 0 ? (
                 items.map((item) => (
-                  <tr key={item.id} className={`group hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30 transition-colors ${selectedIds.includes(item.id) ? 'bg-zinc-50/50 dark:bg-zinc-900/50' : ''}`}>
-                    <td className="px-5 py-3">
+                  <TableRow 
+                    key={item.id} 
+                    className={`group transition-all border-b border-zinc-100 dark:border-zinc-800/50 last:border-0 ${
+                      selectedIds.includes(item.id) 
+                        ? 'bg-blue-50/30 dark:bg-blue-900/10' 
+                        : 'hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50'
+                    }`}
+                  >
+                    <TableCell className="px-6 py-4 text-center">
                       <Checkbox 
                         checked={selectedIds.includes(item.id)}
                         onCheckedChange={(checked) => toggleItem(item.id, !!checked)}
                         aria-label={`Chọn ${item.name}`}
                       />
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+                    </TableCell>
+                    <TableCell className="px-4 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-200/50 dark:border-zinc-700/50 flex-shrink-0 shadow-sm transition-transform">
                           {item.previewUrl ? (
                             <img src={item.previewUrl} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="flex items-center justify-center h-full text-zinc-400">
-                              <ImageIcon size={18} />
+                              <ImageIcon size={20} />
                             </div>
                           )}
                         </div>
-                        <span className="text-sm font-semibold truncate max-w-[150px] text-zinc-700 dark:text-zinc-300" title={item.name}>
-                          {item.name}
-                        </span>
+                        <div className="flex flex-col gap-1 min-w-0 flex-1">
+                          <span className="text-base font-bold text-zinc-900 dark:text-zinc-100 truncate block w-full max-w-[200px]" title={item.name}>
+                            {item.name}
+                          </span>
+                          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">
+                            {item.file.name.split('.').pop()}
+                          </span>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <code className="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 rounded uppercase">
+                    </TableCell>
+                    <TableCell className="px-4 py-5">
+                      <div className="flex items-center gap-2">
+                        <div className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-md text-xs font-bold border border-zinc-200/50 dark:border-zinc-700/50">
                           {item.file.type.split('/')[1]?.toUpperCase() || 'IMG'}
-                        </code>
+                        </div>
                         {item.status === 'done' && (
                           <>
-                            <ArrowRight size={10} className="text-zinc-400" />
-                            <code className="text-[10px] font-bold px-2 py-0.5 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded uppercase">
+                            <ArrowRight size={14} className="text-zinc-400" />
+                            <div className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md text-xs font-black border border-blue-200 dark:border-blue-800/50 shadow-sm">
                               {format.toUpperCase()}
-                            </code>
+                            </div>
                           </>
                         )}
                       </div>
-                    </td>
-                    <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400 font-medium font-mono">
-                      <div className="flex flex-col gap-0.5">
-                        <span className={item.status === 'done' ? 'text-[10px] text-zinc-400 line-through' : ''}>
+                    </TableCell>
+                    <TableCell className="px-4 py-5">
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`text-xs font-bold ${item.status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-400'}`}>
                           {formatBytes(item.file.size)}
                         </span>
                         {item.status === 'done' && item.resultSize && (
-                          <span className="text-zinc-900 dark:text-zinc-100 font-bold">
-                            {formatBytes(item.resultSize)}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-base font-black text-zinc-950 dark:text-white">
+                              {formatBytes(item.resultSize)}
+                            </span>
+                          </div>
                         )}
                       </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        {item.status === 'done' && <CheckCircle2 size={14} className="text-green-500" />}
-                        {item.status === 'error' && <AlertCircle size={14} className="text-red-500" />}
-                        {item.status === 'converting' && <div className="w-3 h-3 border-2 border-zinc-200 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin" />}
-                        
-                        <div className="flex flex-col">
-                          <span className={`text-sm font-semibold ${
-                            item.status === 'done' ? 'text-zinc-900 dark:text-zinc-100' : 
-                            item.status === 'error' ? 'text-red-600' : 
-                            item.status === 'converting' ? 'text-blue-600' : 
-                            'text-zinc-400'
+                    </TableCell>
+                    <TableCell className="px-4 py-5">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2.5">
+                          {item.status === 'done' && (
+                            <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                              <CheckCircle2 size={14} className="text-green-700 dark:text-green-400" />
+                            </div>
+                          )}
+                          {item.status === 'error' && (
+                            <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+                              <AlertCircle size={14} className="text-red-700 dark:text-red-400" />
+                            </div>
+                          )}
+                          {item.status === 'converting' && (
+                            <div className="relative w-6 h-6 flex items-center justify-center">
+                              <div className="absolute inset-0 border-2 border-blue-100 dark:border-blue-900/30 rounded-full" />
+                              <div className="absolute inset-0 border-2 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin" />
+                            </div>
+                          )}
+                          <span className={`text-sm font-black tracking-tight ${
+                            item.status === 'done' ? 'text-green-700 dark:text-green-400' : 
+                            item.status === 'error' ? 'text-red-700 dark:text-red-400' : 
+                            item.status === 'converting' ? 'text-blue-700 dark:text-blue-400' : 
+                            'text-zinc-600 dark:text-zinc-300 font-bold'
                           }`}>
                             {item.status === 'idle' && (item.error ? labels.fixFile : labels.readyToConvert)}
                             {item.status === 'converting' && statusLabels.converting}
                             {item.status === 'done' && statusLabels.done}
                             {item.status === 'error' && statusLabels.error}
                           </span>
-                          {item.status === 'done' && item.resultSize && (
-                            <span className="text-[10px] font-bold text-green-600 uppercase tracking-tight">
-                              Saved {calculateSavings(item.resultSize, item.file.size).savedPercent}%
-                            </span>
-                          )}
                         </div>
+                        {item.status === 'done' && item.resultSize && (
+                          <div className="inline-flex items-center px-2 py-0.5 rounded bg-green-600 text-white text-[10px] font-black uppercase tracking-tight w-fit">
+                            Saved {calculateSavings(item.resultSize, item.file.size).savedPercent}%
+                          </div>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                         {item.status === 'idle' && (
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="icon"
                             onClick={() => onConvertItem(item.id)}
                             disabled={isConverting}
-                            className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                            className="h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                             title="Convert"
                           >
-                            <Zap size={14} />
-                          </button>
+                            <Zap size={14} className="fill-current" />
+                          </Button>
                         )}
                         {item.status === 'done' && (
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="icon"
                             onClick={() => onDownloadItem(item)}
-                            className="p-1.5 text-zinc-400 hover:text-green-600 transition-colors"
+                            className="h-8 w-8 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800/30 hover:bg-green-600 hover:text-white transition-all shadow-sm"
                             title="Download"
                           >
                             <Download size={14} />
-                          </button>
+                          </Button>
                         )}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => onRemoveItem(item.id)}
                           disabled={isConverting}
-                          className="p-1.5 text-zinc-300 hover:text-red-500 transition-colors"
+                          className="h-8 w-8 rounded-lg text-zinc-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                           title="Remove"
                         >
                           <Trash2 size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={5} className="px-5 py-16 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-800">
-                        <ImageIcon size={24} />
+                <TableRow className="hover:bg-transparent border-0">
+                  <TableCell colSpan={6} className="px-5 py-24 text-center">
+                    <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
+                      <div className="w-16 h-16 rounded-2xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-800 border-2 border-zinc-100 dark:border-zinc-800/50">
+                        <ImageIcon size={32} />
                       </div>
-                      <p className="text-sm text-zinc-400 font-medium italic">Continue dragging and dropping images here to start</p>
+                      <div className="flex flex-col gap-1">
+                        <p className="text-sm text-zinc-900 dark:text-zinc-100 font-bold">No images in queue</p>
+                        <p className="text-xs text-zinc-400 font-medium">Drag and drop images here to get started</p>
+                      </div>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {isConverting && (

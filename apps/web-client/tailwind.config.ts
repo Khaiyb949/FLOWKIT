@@ -10,10 +10,6 @@ export default {
       colors: {
         primary: 'var(--primary-color)',
       },
-      fontFamily: {
-        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-display)', 'serif'],
-      },
     },
   },
   darkMode: 'class',
